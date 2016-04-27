@@ -8,10 +8,18 @@
   <body>
     <h1>Rap Studio</h1>
 
-    <form onsubmit="submitLyric()">
+    <form method="post">
       <label>Enter your lyric...</label>
-      <input type="text" id="title1">
-      <input type="submit" id="submit-button">
+      <input type="text" name="input_lyric" value="{{input_lyric}}">
+      <input type="submit">
     </form>
+
+    {% if output_lyrics %}
+    <h2>Suggested Lyrics</h2>
+    {% endif %}
+
+    {% for lyric in output_lyrics %}
+    <p>{{lyric}}</p>
+    {% endfor %}
   </body>
 </html>

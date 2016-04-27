@@ -34,6 +34,12 @@ class MainHandler(webapp2.RequestHandler):
     def get(self):
         self.render('main.html')
 
+    def post(self):
+        """ submit the input lyric and generate suggested lyrics """
+        input_lyric = self.request.get('input_lyric')
+        output_lyrics = [input_lyric, "my diamonds they say pikachu", "remember the name"]
+        self.render('main.html', input_lyric=input_lyric, output_lyrics=output_lyrics)
+
 app = webapp2.WSGIApplication([
     ('/', MainHandler)
 ], debug=True)
