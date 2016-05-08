@@ -14,7 +14,9 @@ reload(rhyme_analyzer)  to update changes
 '''
 
 THREE_CHAR_PHONEMES = ['aI@', 'aU@']
-TWO_CHAR_PHONEMES = ['tS','dZ','l^','n^','3:','@L','@2','@5','aa','a#','A:','A@','e@','I2','i:','i@','u:','U@','O:','O@','o@','aI','eI','OI','aU','oU']
+TWO_CHAR_PHONEMES = ['l^','n^','3:','@L','@2','@5','aa','a#','A:','A@','e@','I2','i:','i@','u:','U@','O:','O@','o@','aI','eI','OI','aU','oU']
+ONE_CHAR_PHONEMES = ['@','3','a','E','I','i','0','V','U']
+
 
 def sort_by_rhyme(user_verse, gen_verses):
     '''
@@ -73,7 +75,10 @@ def separate_phonemes(phonemes):
         elif two in TWO_CHAR_PHONEMES:
             result.append(two)
             idx += 2
-        else:
+        elif one in ONE_CHAR_PHONEMES:
             result.append(one)
+            idx += 1
+        else:
+            # skip over consonant sounds and other characters
             idx += 1
     return result
