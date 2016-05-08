@@ -38,19 +38,15 @@ def rhyme_score(verse1, verse2):
     phonemes1 = separate_phonemes(translate_to_phonemes(verse1))
     phonemes2 = separate_phonemes(translate_to_phonemes(verse2))
 
-    # TODO - define a better similarity function
-    # consider removing consonants and focus only on vowels=rhymes
-    # score = SequenceMatcher(None, phonemes1, phonemes2).ratio()
-
     score = 0
     length = min(END_RHYME_LEN, len(phonemes1), len(phonemes2))
     for back_idx in range(1, length+1):
         score += phoneme_match(phonemes1[-back_idx], phonemes2[-back_idx])
 
-    print verse1, '=>', phonemes1
-    print verse2, '=>', phonemes2
-    print 'Score:', score
-    print '----'
+    # print verse1, '=>', phonemes1
+    # print verse2, '=>', phonemes2
+    # print 'Score:', score
+    # print '----'
     return score
 
 
