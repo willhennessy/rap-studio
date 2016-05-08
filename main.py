@@ -18,6 +18,7 @@ import webapp2
 import os
 import jinja2
 import string
+from rhyme_analyzer import sort_by_rhyme
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
@@ -35,9 +36,10 @@ class MainHandler(webapp2.RequestHandler):
         self.render('main.html')
 
     def post(self):
-        """ submit the input lyric and generate suggested lyrics """
-        input_lyric = self.request.get('input_lyric')
-        output_lyrics = [input_lyric, "my diamonds they say pikachu", "remember the name"]
+        ''' submit the input lyric and generate suggested lyrics '''
+        user_verse = self.request.get('input_lyric')
+        lyrics_db = open('generated_lines.txt').read().splitlines()
+        output_lyrics = sort_by_rhyme(user_verse, lyrics_db)
         self.render('main.html', input_lyric=input_lyric, output_lyrics=output_lyrics)
 
 app = webapp2.WSGIApplication([
