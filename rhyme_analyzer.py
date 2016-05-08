@@ -1,6 +1,7 @@
 import subprocess
 import re
 from difflib import SequenceMatcher
+import time
 
 '''
 How to test in python console:
@@ -35,6 +36,7 @@ def rhyme_score(verse1, verse2):
     output: score of how well the verses rhyme together
     Returns a high score if the last word of the two verses are phonetically similar
     '''
+    start = time.time()
     phonemes1 = separate_phonemes(translate_to_phonemes(verse1))
     phonemes2 = separate_phonemes(translate_to_phonemes(verse2))
 
@@ -42,6 +44,8 @@ def rhyme_score(verse1, verse2):
     length = min(END_RHYME_LEN, len(phonemes1), len(phonemes2))
     for back_idx in range(1, length+1):
         score += phoneme_match(phonemes1[-back_idx], phonemes2[-back_idx])
+
+    print "%s seconds" % (time.time() - start)
 
     # print verse1, '=>', phonemes1
     # print verse2, '=>', phonemes2
@@ -62,7 +66,7 @@ def phoneme_match(one, two):
     ee = {'i','i:'}
     orr = {'O@', 'o@'}
     aa = {'a', 'aa'}
-    print one,two
+
     if one == two:
         return 1.0
     elif one in uh and two in uh:
@@ -82,7 +86,8 @@ def phoneme_match(one, two):
 def translate_to_phonemes(verse):
     ''' NOTE: the shell=True parameter is a security hazard.
                 maybe shouldn't use it for web form input '''
-    command = u"espeak -xq -v%s '%s'" % ('en-us', verse)
+    clean_verse = re.sub("['\"]", '', verse)
+    command = u"espeak -xq -v%s '%s'" % ('en-us', clean_verse)
     phonetics = subprocess.check_output(command, shell=True)
     return re.sub("[',\s+$]", '', phonetics)
 
