@@ -3,54 +3,46 @@ import re
 from difflib import SequenceMatcher
 import time
 
-'''
-How to test in python console:
-
-from rhyme_analyzer import *
-import rhyme_analyzer
-sort_by_rhyme("Who cut other people open like cantaloupes", ["Who cut other people open like cantaloupes", "But if we can hump dead animals and antelopes","Then there's no reason that a man and another man can't elope","But if you feel like I feel, I got the antidote","Women wave your pantyhose, sing the chorus and it goes"])
-
-
-reload(rhyme_analyzer)  to update changes
-'''
-
 END_RHYME_LEN = 3
 
 THREE_CHAR_PHONEMES = ['aI@', 'aU@']
 TWO_CHAR_PHONEMES = ['l^','n^','3:','@L','@2','@5','aa','a#','A:','A@','e@','I2','i:','i@','u:','U@','O:','O@','o@','aI','eI','OI','aU','oU']
 ONE_CHAR_PHONEMES = ['@','3','a','E','I','i','0','V','U']
 
+uh = {'@','a#','@2', 'V'}
+i = {'I','I2'}
+ee = {'i','i:'}
+orr = {'O@', 'o@'}
+aa = {'a', 'aa'}
 
-def sort_by_rhyme(user_verse, gen_verses):
+
+def sort_by_rhyme(user_verse, gen_verses, phonetics_db):
     '''
     input:  user_verse - string provided by the user
             gen_verses - list of verses to be sorted
+            phonetics_db - list of verses in phonetic representation
     output: sorted list of verses from best rhyme score to worst
     '''
-    return sorted(gen_verses, key=lambda verse: rhyme_score(user_verse, verse), reverse = True)
+    user_verse_phonemes = separate_phonemes(translate_to_phonemes(slice_end(user_verse)))
+
+    top_indices = sorted(range(len(phonetics_db)), key=lambda verse_idx:
+        rhyme_score(user_verse_phonemes, separate_phonemes(phonetics_db[verse_idx])), reverse = True)[:10]
+
+    return [gen_verses[idx] for idx in top_indices]
 
 
-def rhyme_score(verse1, verse2):
+def rhyme_score(phonemes1, phonemes2):
     '''
     input:  two musical verses (string)
     output: score of how well the verses rhyme together
     Returns a high score if the last word of the two verses are phonetically similar
     '''
-    start = time.time()
-    phonemes1 = separate_phonemes(translate_to_phonemes(verse1))
-    phonemes2 = separate_phonemes(translate_to_phonemes(verse2))
-
     score = 0
     length = min(END_RHYME_LEN, len(phonemes1), len(phonemes2))
     for back_idx in range(1, length+1):
         score += phoneme_match(phonemes1[-back_idx], phonemes2[-back_idx])
 
-    print "%s seconds" % (time.time() - start)
-
-    # print verse1, '=>', phonemes1
-    # print verse2, '=>', phonemes2
-    # print 'Score:', score
-    # print '----'
+    #print phonemes1, phonemes2, score
     return score
 
 
@@ -61,12 +53,6 @@ def phoneme_match(one, two):
 
     List of all phonemes:  http://espeak.sourceforge.net/phonemes.html
     '''
-    uh = {'@','a#','@2', 'V'}
-    i = {'I','I2'}
-    ee = {'i','i:'}
-    orr = {'O@', 'o@'}
-    aa = {'a', 'aa'}
-
     if one == two:
         return 1.0
     elif one in uh and two in uh:
@@ -86,14 +72,22 @@ def phoneme_match(one, two):
 def translate_to_phonemes(verse):
     ''' NOTE: the shell=True parameter is a security hazard.
                 maybe shouldn't use it for web form input '''
-    clean_verse = re.sub("['\"]", '', verse)
-    command = u"espeak -xq -v%s '%s'" % ('en-us', clean_verse)
+    command = u"espeak -xq -v%s \"%s\"" % ('en-us', verse)
     phonetics = subprocess.check_output(command, shell=True)
     return re.sub("[',\s+$]", '', phonetics)
 
 
-def last_word(verse):
-    return verse.rsplit(None, 1)[-1]
+def convert_db_to_phonetics():
+    ''' static method to convert the text file to phonetics '''
+    lyrics_db = open('generated_lines.txt').read().splitlines()
+    file_out = open('generated_lines_phonetics.txt', 'w')
+    for verse in lyrics_db:
+        phonemes = translate_to_phonemes(slice_end(verse))
+        file_out.write("%s\n" % phonemes)
+
+
+def slice_end(verse):
+    return ' '.join(verse.rsplit(None, 3)[-3:])
 
 
 def separate_phonemes(phonemes):
