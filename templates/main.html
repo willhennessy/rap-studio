@@ -2,24 +2,37 @@
 <html>
   <head>
     <title>Rap Studio</title>
-    <link type="text/css" rel="stylesheet" href="css/stylesheet.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     <script src="js/main.js"></script>
+    <style type="text/css">
+      body { background: #778899 !important; } 
+    </style>
   </head>
   <body>
-    <h1>Rap Studio</h1>
+    <div class="container">
+      <h1>Rap Studio</h1>
+      <div class="row">
+        <form method="post">
+          <div class="col-lg-6">
+            <div class="input-group"> 
+              <input type="text" placeholder="Enter a line" class="form-control" name="input_lyric" value="{{input_lyric}}">
+              <div class="input-group-btn">
+                <button type="submit" class="btn btn-primary">Give me a line!</button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
 
-    <form method="post">
-      <label>Enter your lyric...</label>
-      <input type="text" name="input_lyric" value="{{input_lyric}}">
-      <input type="submit">
-    </form>
+      {% if output_lyrics %}
+      <h2>Suggested Lyrics</h2>
+      {% endif %}
 
-    {% if output_lyrics %}
-    <h2>Suggested Lyrics</h2>
-    {% endif %}
-
-    {% for lyric in output_lyrics %}
-    <p>{{lyric}}</p>
-    {% endfor %}
+      <ul class="list-group">
+        {% for lyric in output_lyrics %}
+        <li class="list-group-item">{{lyric}}</li>
+        {% endfor %}
+      </ul>
+    </div>
   </body>
 </html>
